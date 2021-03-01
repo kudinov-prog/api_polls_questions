@@ -1,14 +1,12 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-import datetime
-
+from django.db import models
 
 User = get_user_model()
 
 
 class Choice(models.Model):
     question = models.ForeignKey(
-        'Question', related_name='choices_question',on_delete=models.CASCADE
+        'Question', related_name='choices_question', on_delete=models.CASCADE
     )
     text = models.CharField(
         max_length=256
@@ -30,7 +28,10 @@ class Question(models.Model):
         max_length=1024
     )
     question_type = models.CharField(
-        max_length=32, choices=CHOICES
+        max_length=32, choices=CHOICES, default=TEXT
+    )
+    poll = models.ForeignKey(
+        'Poll', on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -45,12 +46,11 @@ class Poll(models.Model):
         auto_now_add=True
     )
     finished = models.DateTimeField(
-        blank=True
+        blank=True, null=True
     )
     description = models.TextField(
         max_length=4096
     )
-    #questions = models.ManyToManyField(Question)
 
     def __str__(self):
         return self.name
@@ -74,7 +74,7 @@ class Answer(models.Model):
         Question, related_name='answers_question', on_delete=models.CASCADE
     )
     vote = models.ForeignKey(
-        Vote, related_name='answers_vote', on_delete=models.CASCADE
+        Vote, related_name='answers', on_delete=models.CASCADE
     )
     choice = models.ForeignKey(
         Choice, related_name='answers_choice', on_delete=models.CASCADE
